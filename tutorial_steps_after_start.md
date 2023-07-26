@@ -107,4 +107,7 @@ namespace API.Controllers
 21. Begin Source Control
     1.  git init
     2.  dotnet new gitignore
-    3.  add "appsettings.json" to gitignore
+    3.  add "appsettings.json", "*.db-shm", "*.db-wal" to gitignore
+    4.  git add .
+    5.  git ci -m'initial commit'
+    6.  add remote branch
