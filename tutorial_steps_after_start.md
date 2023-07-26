@@ -111,3 +111,95 @@ namespace API.Controllers
     4.  git add .
     5.  git ci -m'initial commit'
     6.  add remote branch
+
+
+22. Create a react app
+    1.  npx create-react-app client-app --use-npm --template typescript
+23. Install axios
+24. on App.tsx, create a state for fetching activities and use a useEffect to fetch activities from your c# application:
+```tsx
+function App() {
+  const [activities, setActivities] = useState([]);
+
+  useEffect(() => {
+    axios.get("http://localhost:5000/api/activities")
+      .then(res => {
+        console.log(res.data);
+        setActivities(res.data);
+      })
+  }, []);
+
+  return (
+    <div className="App">
+      <header className="App-header">
+        <img src={logo} className="App-logo" alt="logo" />
+        <ul>
+          {activities.length && activities.map((activity: any) => (
+            <li key={activity.id}>
+              {activity.title
+              }</li>
+          ))}
+        </ul>
+      </header>
+    </div>
+  );
+}
+
+export default App;
+```
+25. There will be an error due to a CORS Policy issue.
+    1.  To bypass, I need to attach a header giving permissions:
+        1.  In Program.cs, add the CORS as a service the middleware to attach the CORS to the response going out to our client.
+```cs
+...
+...
+// Add CORS Service which contains our policy
+builder.Services.AddCors(opt => {
+    opt.AddPolicy("CorsPolicy", policy => {
+        policy.AllowAnyMethod().AllowAnyHeader().WithOrigins("http://localhost:3000");
+    });
+});
+
+var app = builder.Build();
+...
+```
+```cs
+...
+if (app.Environment.IsDevelopment())
+{
+  app.UseSwagger();
+  app.UseSwaggerUI();
+}
+// Cors Middleware to attach the policy to the response. Notes: The "CorsPolicy" string must match the Cors Service string above. We want this to be ran fairly early in the pipeline process.
+app.UseCors("CorsPolicy");
+...
+```
+- This will solve the CORSPolicy issue
+26. Install semantic-ui for react and style the react app.
+```tsx
+function App() {
+  const [activities, setActivities] = useState([]);
+
+  useEffect(() => {
+    axios.get("http://localhost:5000/api/activities")
+      .then(res => {
+        console.log(res.data);
+        setActivities(res.data);
+      })
+  }, []);
+
+  return (
+    <div>
+      <Header as='h2' icon='users' content='Reactivities' />
+      <List>
+        {activities.length && activities.map((activity: any) => (
+          <List.Item key={activity.id}>
+            {activity.title
+            }</List.Item>
+        ))}
+      </List>
+    </div>
+  );
+}
+```
+27. remove React.StrictMode on index.tsx

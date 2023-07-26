@@ -39,16 +39,26 @@ builder.Services.AddDbContext<DataContext>(opt =>
   opt.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
+// Add CORS Service which contains our policy
+builder.Services.AddCors(opt => {
+    opt.AddPolicy("CorsPolicy", policy => {
+        policy.AllowAnyMethod().AllowAnyHeader().WithOrigins("http://localhost:3000");
+    });
+});
+
 var app = builder.Build();
 
 
 
+// MIDDLEWARE (BELOW) NOTE: Order Matters
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
   app.UseSwagger();
   app.UseSwaggerUI();
 }
+// Cors Middleware to attach the policy to the response. Notes: The "CorsPolicy" string must match the Cors Service string above. We want this to be ran fairly early in the pipeline process.
+app.UseCors("CorsPolicy");
 
 /*NOTES:
 - The HTTP Request pipeline is essentially middleware.
